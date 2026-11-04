@@ -1,0 +1,106 @@
+Assignment 1
+DHT11 Temperature Alert System
+
+Code: 
+
+#include <DHT.h>
+#define DHTPIN 7     
+#define DHTTYPE DHT11  
+#define LEDPIN 8     
+ 
+DHT dht(DHTPIN, DHTTYPE);
+const float TEMP_THRESHOLD = 30.0; 
+void setup() {
+  Serial.begin(9600);
+  pinMode(LEDPIN, OUTPUT);
+  dht.begin();
+}
+void loop() {
+  float temp = dht.readTemperature();
+  if (isnan(temp)) {
+    Serial.println("Failed to read from DHT sensor!");
+    return;
+  }
+  Serial.print("Temperature: ");
+  Serial.print(temp);
+  Serial.println(" °C")
+  if (temp > TEMP_THRESHOLD) {
+    digitalWrite(LEDPIN, HIGH); 
+    Serial.println("ALERT: Temperature exceeded limit!");
+  } else {
+    digitalWrite(LEDPIN, LOW); 
+  }
+  delay(2000); 
+}
+
+
+Assignment 2
+PIR Sensor Interfacing
+
+Code:
+
+#define PIR_PIN 7    // PIR sensor OUT pin connected to Digital Pin 2
+#define LED_PIN 8   // LED connected to Digital Pin 13
+
+void setup() {
+  pinMode(PIR_PIN, INPUT);
+  pinMode(LED_PIN, OUTPUT);
+  Serial.begin(9600);
+  
+  Serial.println("Calibrating PIR Sensor... Please wait.");
+  delay(10000); // PIR sensor requires ~10s to warm up and adapt to ambient infrared
+  Serial.println("PIR Ready.");
+}
+
+void loop() {
+  int motionDetected = digitalRead(PIR_PIN);
+
+  if (motionDetected == HIGH) {
+    digitalWrite(LED_PIN, HIGH);   // Turn ON LED
+    Serial.println("Motion Detected!");
+  } else {
+    digitalWrite(LED_PIN, LOW);    // Turn OFF LED
+    Serial.println("No Motion.");
+  }
+
+  delay(500); // Short delay to prevent serial flood
+}
+
+
+Assignment No 4
+LDR
+Code:
+
+#define LDR_PIN 34
+#define LED_PIN 25
+
+// ADJUST THESE BASED ON YOUR SERIAL MONITOR READINGS
+const int DARK_THRESHOLD = 800;   // The raw value you see in your dark room
+const int BRIGHT_THRESHOLD = 3600; // The raw value you see under direct light
+
+void setup() {
+  Serial.begin(115200);
+  ledcAttach(LED_PIN, 5000, 8); 
+  analogReadResolution(12);
+}
+
+void loop() {
+  int lightValue = analogRead(LDR_PIN);
+
+  // Map using your real-world thresholds instead of 0 and 4095
+  // If your LED is still inverted, swap the '255' and '0' at the end!
+  int brightness = map(lightValue, DARK_THRESHOLD, BRIGHT_THRESHOLD, 0, 255);
+  
+  // Constrain keeps the value strictly between 0 and 255
+  brightness = constrain(brightness, 0, 255);
+
+  ledcWrite(LED_PIN, brightness);
+
+  Serial.print("Raw LDR: ");
+  Serial.print(lightValue);
+  Serial.print(" | Fixed LED Brightness: ");
+  Serial.println(brightness);
+
+  delay(5); // Reduced from 500ms to 50ms for smooth, gradual real-time transitions
+}
+
