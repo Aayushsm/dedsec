@@ -104,3 +104,33 @@ void loop() {
   delay(5); // Reduced from 500ms to 50ms for smooth, gradual real-time transitions
 }
 
+arduino code:
+
+#define LDR_PIN A0  
+#define LED_PIN 9   
+
+const int DARK_THRESHOLD = 200;   
+const int BRIGHT_THRESHOLD = 900; 
+
+void setup() {
+  Serial.begin(9600);      
+  pinMode(LED_PIN, OUTPUT); 
+}
+
+void loop() {
+  int lightValue = analogRead(LDR_PIN);
+  
+  int brightness = map(lightValue, DARK_THRESHOLD, BRIGHT_THRESHOLD, 0, 255);
+  
+  brightness = constrain(brightness, 0, 255);
+  
+  analogWrite(LED_PIN, brightness);
+
+  Serial.print("Raw LDR: ");
+  Serial.print(lightValue);
+  Serial.print(" | Fixed LED Brightness: ");
+  Serial.println(brightness);
+  
+  delay(50); 
+}
+
